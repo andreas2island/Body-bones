@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<!--
+  BoneAtlas — landing page for GitHub Pages.
+
+  Three files sit side by side in the repo:
+      index.html               this page (what people get at the root URL)
+      app.html                 the app itself, fully self-contained
+      BoneAtlas-v5_3_7.apk     the Android build
+
+  To change what the root URL does, rename the files — but then also update the
+  two hrefs marked APP_LINK and APK_LINK below, or they will 404.
+-->
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BoneAtlas — skelettatlas och spotter-quiz</title>
+<meta name="description" content="Offline anatomiatlas för svenska medicin- och fysioterapistudenter. 228 ben på latin, svenska och engelska.">
+<style>
+  :root{
+    --ivory:#f6f1e6;
+    --paper:#fffdf8;
+    --ink:#1e211f;
+    --ink-soft:#5c6360;
+    --green:#1b4d3e;
+    --teal:#2f7f75;
+    --gold:#8a5a06;
+    --gold-wash:#f0dcae;
+    --rule:#d8d2c2;
+  }
+  *{ box-sizing:border-box; }
+  html{ -webkit-text-size-adjust:100%; }
+  body{
+    margin:0; background:var(--ivory); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:17px; line-height:1.55;
+  }
+  .wrap{ max-width:33rem; margin:0 auto; padding:0 20px 64px 20px; }
+
+  /* ---------- specimen card: the app's own name sheet, enlarged ---------- */
+  .card{
+    background:var(--paper); border:1px solid var(--rule);
+    border-top:5px solid var(--green);
+    margin:28px 0 0 0; padding:22px 20px 20px 20px;
+  }
+  .fma{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--ink-soft);
+    display:flex; justify-content:space-between; gap:12px;
+    border-bottom:1px solid var(--rule); padding-bottom:9px; margin-bottom:16px;
+  }
+  .la{
+    font-family:Georgia,"Times New Roman",serif; font-style:italic;
+    font-size:29px; line-height:1.15; margin:0;
+  }
+  .la em{
+    font-style:italic; position:relative; display:inline-block;
+    padding:1px 5px; margin-left:-5px;
+  }
+  .la em::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; right:100%;
+    background:var(--gold-wash); z-index:0;
+    animation:select .55s ease-out .35s forwards;
+  }
+  .la em span{ position:relative; z-index:1; }
+  @keyframes select{ to{ right:0; } }
+  @media (prefers-reduced-motion: reduce){
+    .la em::before{ animation:none; right:0; }
+  }
+  .sv{ font-size:19px; font-weight:600; margin:13px 0 0 0; }
+  .en{ font-size:16px; color:var(--ink-soft); margin:1px 0 0 0; }
+  .chip{
+    display:inline-block; margin-top:14px; padding:3px 10px; border-radius:11px;
+    background:var(--ivory); color:var(--ink-soft); font-size:12px;
+  }
+
+  h1{
+    font-size:15px; font-weight:700; letter-spacing:.15em; text-transform:uppercase;
+    margin:34px 0 8px 0; color:var(--green);
+  }
+  .lede{ margin:0; }
+  .lede-en{ margin:8px 0 0 0; color:var(--ink-soft); font-size:15px; }
+
+  /* ---------- actions ---------- */
+  .actions{ margin:26px 0 0 0; }
+  .btn{
+    display:block; text-decoration:none; text-align:center;
+    padding:15px 18px; margin-bottom:10px; border-radius:10px;
+    font-size:17px; font-weight:700;
+  }
+  .btn-apk{ background:var(--green); color:#fffdf8; }
+  .btn-apk .sub{
+    display:block; font-weight:400; font-size:13px; opacity:.82; margin-top:3px;
+  }
+  .btn-web{ background:var(--paper); color:var(--teal); border:1.5px solid var(--teal); }
+  .btn:focus-visible{ outline:3px solid var(--gold); outline-offset:2px; }
+
+  /* ---------- figures ---------- */
+  .facts{ border-top:1px solid var(--rule); margin-top:12px; }
+  .fact{
+    display:flex; align-items:baseline; gap:14px;
+    border-bottom:1px solid var(--rule); padding:11px 0;
+  }
+  .fact b{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:15px; font-weight:600; color:var(--green);
+    min-width:3.2rem; text-align:right;
+  }
+  .fact span{ font-size:15px; }
+
+  /* ---------- install: a real sequence, so numbered ---------- */
+  ol{ margin:14px 0 0 0; padding:0; list-style:none; counter-reset:step; }
+  ol li{
+    counter-increment:step; position:relative;
+    padding:0 0 13px 34px; font-size:15px;
+  }
+  ol li::before{
+    content:counter(step); position:absolute; left:0; top:2px;
+    width:22px; height:22px; line-height:22px; text-align:center;
+    background:var(--green); color:#fffdf8; border-radius:11px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12px;
+  }
+  .note{ font-size:14px; color:var(--ink-soft); margin:12px 0 0 0; }
+  footer{
+    margin-top:34px; padding-top:16px; border-top:1px solid var(--rule);
+    font-size:13px; color:var(--ink-soft);
+  }
+  footer a{ color:var(--teal); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- the one bone, named three ways, with the app's amber selection wash -->
+  <div class="card">
+    <div class="fma"><span>FMA24475</span><span>BoneAtlas 5.3.7</span></div>
+    <p class="la"><em><span>Os femoris sinistra</span></em></p>
+    <p class="sv">Lårben vänster</p>
+    <p class="en">Left femur</p>
+    <span class="chip">Nedre extremitet</span>
+  </div>
+
+  <h1>Skelettatlas för spotting</h1>
+  <p class="lede">Tryck på ett ben i skelettet och få namnet på latin, svenska
+  och engelska. Öva med spotter-quiz och tiominuterspluggen som väljer det du
+  kan sämst. Allt fungerar utan nätverk.</p>
+  <p class="lede-en">An offline skeleton atlas and spotter quiz for Swedish
+  medical, physiotherapy and nursing students. Every bone named in Latin,
+  Swedish and English.</p>
+
+  <div class="actions">
+    <!-- APK_LINK -->
+    <a class="btn btn-apk" href="./BoneAtlas-v5_3_7.apk">Ladda ner till Android
+      <span class="sub">APK · 879 kB · version 5.3.7</span></a>
+    <!-- APP_LINK -->
+    <a class="btn btn-web" href="./app.html">Öppna i webbläsaren</a>
+  </div>
+
+  <h1>Innehåll</h1>
+  <div class="facts">
+    <div class="fact"><b>228</b><span>ben med latinskt, svenskt och engelskt namn</span></div>
+    <div class="fact"><b>5</b><span>närbildsvyer: skalle, hand, ryggrad, bröstkorg, fot</span></div>
+    <div class="fact"><b>8</b><span>kameravinklar utöver kroppens fram- och baksida</span></div>
+    <div class="fact"><b>10</b><span>minuters adaptiv plugg med svaghetskarta</span></div>
+    <div class="fact"><b>0</b><span>behörigheter, konton och nätverksanrop</span></div>
+  </div>
+
+  <h1>Installera på Android</h1>
+  <ol>
+    <li>Tryck på <strong>Ladda ner till Android</strong> ovan.</li>
+    <li>Öppna filen när den laddats ner. Android varnar för okänd källa: appen
+      installeras vid sidan av Play Butik, inte genom den.</li>
+    <li>Tillåt installation från webbläsaren och tryck <strong>Installera</strong>.</li>
+  </ol>
+  <p class="note">Studerade ben och quizresultat sparas bara på telefonen.
+  Webbversionen sparar i webbläsaren och delar därför inte framsteg med appen.</p>
+
+  <footer>
+    Skelettgeometrin kommer från <a href="https://lifesciencedb.jp/bp3d/">BodyParts3D</a>,
+    The Database Center for Life Science, licensierad
+    <a href="https://creativecommons.org/licenses/by-sa/2.1/jp/">CC BY-SA 2.1 Japan</a>.
+    Kartvyn använder <a href="https://leafletjs.com/">Leaflet</a>.
+    Källkod på <a href="https://github.com/andreas2island/Body-bones">github.com/andreas2island/Body-bones</a>.
+  </footer>
+
+</div>
+</body>
+</html>
