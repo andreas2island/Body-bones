@@ -182,7 +182,7 @@
       <span id="apk-main">Ladda ner till Android</span>
       <span class="sub" id="apk-sub">Letar efter senaste versionen…</span></a>
     <!-- APP_LINK -->
-    <a class="btn btn-web" href="./app.html">Öppna i webbläsaren</a>
+    <a class="btn btn-web" id="web-app" href="./app.html">Öppna i webbläsaren</a>
     <button class="btn btn-ghost" id="hero-btn" type="button" aria-expanded="false" aria-controls="hero">
       Visa skelettet
     </button>
@@ -308,6 +308,10 @@
       btn.href = hit.file.download_url || ("./" + hit.file.name);
       btn.setAttribute("download", hit.file.name);
       main.textContent = "Ladda ner till Android";
+      // app.html is a separate file and browsers cache it aggressively; stamping
+      // the link with the current version forces a re-fetch after a release
+      var wa = document.getElementById("web-app");
+      if (wa){ wa.href = "./app.html?v=" + hit.ver.text; }
       sub.textContent = "APK \u00b7 " + kb(hit.file.size) + " \u00b7 version " + hit.ver.text;
       card.textContent = "BoneAtlas " + hit.ver.text;
     })
