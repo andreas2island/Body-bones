@@ -1060,6 +1060,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .heat-cell.lv-none .hc-name, .heat-cell.lv-none .hc-val{ color:var(--text-dim); }
   .heat-empty{ font-size:13px; color:var(--text-dim); margin:0 0 10px 0; }
 
+  /* v5.7.0 — five tabs. At 360px each tab is 72px, so the labels tighten a
+     step; FRAMSTEG is the longest word in the bar and must not truncate. */
+  .nav-btn{ padding-left:2px; padding-right:2px; }
+  .nav-btn span[data-i18n]{ font-size:10px; letter-spacing:0; }
+
   /* v5.4.0 — illustration on the About page. Sized by WIDTH: a viewport-height
      rule collapses to nothing in some WebViews. */
   .about-fig{ margin:2px 0 18px 0; padding:0; text-align:center; }
@@ -1084,6 +1089,51 @@ svg.leaflet-image-layer.leaflet-interactive path {
             background:var(--nav-bg); color:#fffdf8;
             font-family:inherit; font-size:17px; font-weight:700; }
   .wel-btn:active{ background:var(--accent); }
+
+  /* v5.6.0 — name drill. One card, one thumb, no keyboard: typing a Latin term
+     on a phone tests spelling, not anatomy. */
+  #page-names.active{ display:flex; flex-direction:column; }
+  .names-head{ flex:0 0 auto; display:flex; align-items:center;
+               justify-content:space-between; padding:10px 12px;
+               background:var(--surface); border-bottom:1px solid var(--nav-border); }
+  .names-count{ font-size:13px; color:var(--text-dim); }
+  .names-stage{ flex:1 1 auto; display:flex; align-items:center;
+                justify-content:center; padding:16px; min-height:0; overflow:auto; }
+  .card-face{ width:100%; max-width:420px; background:var(--surface);
+              border:1px solid var(--input-border); border-top:4px solid var(--accent);
+              border-radius:12px; padding:22px 18px; text-align:center; }
+  .card-lang{ display:inline-block; padding:3px 10px; border-radius:11px;
+              background:var(--chip-bg); color:var(--text-dim); font-size:12px;
+              letter-spacing:.05em; text-transform:uppercase; }
+  .card-prompt{ margin:14px 0 0 0; font-size:26px; line-height:1.25;
+                font-weight:600; color:var(--text); }
+  .card-ask{ margin:10px 0 0 0; font-size:14px; color:var(--text-dim); }
+  .card-answer{ margin-top:18px; padding-top:16px; border-top:1px solid var(--input-border); }
+  .card-answer[hidden]{ display:none; }
+  /* the asked language is the answer; the third name is context, so it recedes */
+  .ca-1{ margin:0; font-size:24px; font-weight:600; color:var(--ok); line-height:1.25; }
+  .ca-2{ margin:8px 0 0 0; font-size:14px; color:var(--text-dim); }
+  .ca-region{ display:inline-block; margin-top:10px; padding:2px 9px;
+              border-radius:10px; background:var(--chip-bg);
+              color:var(--text-dim); font-size:12px; }
+  .names-actions{ flex:0 0 auto; padding:0 12px 14px 12px; }
+  .names-show{ display:block; width:100%; padding:15px; border:none; border-radius:10px;
+               background:var(--accent); color:var(--on-accent);
+               font-family:inherit; font-size:17px; font-weight:700; }
+  .names-rate{ display:flex; gap:10px; }
+  .names-rate[hidden]{ display:none; }
+  .names-rate button{ flex:1 1 0; padding:15px 8px; border-radius:10px;
+                      font-family:inherit; font-size:16px; font-weight:700;
+                      border:1.5px solid; background:var(--surface); }
+  .rate-no{ color:var(--err); border-color:var(--err); }
+  .rate-yes{ color:var(--ok); border-color:var(--ok); }
+  .names-done{ flex:0 0 auto; padding:0 16px 18px 16px; text-align:center; }
+  .names-done[hidden]{ display:none; }
+  .names-done h2{ margin:0; font-size:20px; color:var(--text); }
+  .names-done p{ margin:6px 0 14px 0; font-size:15px; color:var(--text-dim); }
+  .names-again{ width:100%; padding:14px; border:none; border-radius:10px;
+                background:var(--nav-bg); color:#fffdf8;
+                font-family:inherit; font-size:16px; font-weight:700; }
 
   /* v5.3.3 — the toggle acknowledges the tap on the same frame it is pressed,
      before the plate swap runs. No transforms: old WebKit renders them badly. */
@@ -1210,6 +1260,37 @@ svg.leaflet-image-layer.leaflet-interactive path {
       </div>
     </div>
 
+    <div id="page-names" class="page">
+      <div class="names-head">
+        <button type="button" id="names-x" class="browse-back" data-i18n="names.quit">\u2039 Avsluta</button>
+        <span class="names-count" id="names-count"></span>
+      </div>
+      <div class="names-stage">
+        <div class="card-face">
+          <span class="card-lang" id="card-lang"></span>
+          <p class="card-prompt" id="card-prompt"></p>
+          <p class="card-ask" id="card-ask"></p>
+          <div class="card-answer" id="card-answer" hidden>
+            <p class="ca-1" id="ca-1"></p>
+            <p class="ca-2" id="ca-2"></p>
+            <span class="ca-region" id="ca-region"></span>
+          </div>
+        </div>
+      </div>
+      <div class="names-actions">
+        <button class="names-show" id="names-show" type="button" data-i18n="names.show">Visa svar</button>
+        <div class="names-rate" id="names-rate" hidden>
+          <button class="rate-no" id="rate-no" type="button" data-i18n="names.no">Kunde inte</button>
+          <button class="rate-yes" id="rate-yes" type="button" data-i18n="names.yes">Kunde</button>
+        </div>
+      </div>
+      <div class="names-done" id="names-done" hidden>
+        <h2 id="names-done-t"></h2>
+        <p id="names-done-s"></p>
+        <button class="names-again" id="names-again" type="button" data-i18n="names.again">Ny omg\u00e5ng</button>
+      </div>
+    </div>
+
     <div id="page-bone" class="page">
       <div id="bone-content" style="display:none; flex-direction:column; flex:1 1 auto; min-height:0;">
         <div class="bone-head">
@@ -1231,6 +1312,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <p id="mina-count">0</p>
         <p id="mina-sub"></p>
         <p id="mina-quiz" style="font-size:13px;color:var(--text-dim);margin:8px 0 0 0;"></p>
+        <p id="mina-names" style="font-size:13px;color:var(--text-dim);margin:3px 0 0 0;"></p>
       </div>
       <div id="prog-tools">
         <button class="prog-card" id="prog-more" type="button">
@@ -1245,6 +1327,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
           <span class="pc-text"><span data-i18n="prog.landmark">Landm\u00e4rkes-spotter</span><span class="pc-sub warn-text" data-i18n="prog.landmark.sub">Inte tillg\u00e4nglig \u00e4n.</span></span>
           <span class="pc-badge warn">!</span>
         </div>
+        <button class="prog-card" id="names-start" type="button">
+          <span class="pc-text"><span data-i18n="prog.names">Namntr\u00e4ning</span><span class="pc-sub" data-i18n="prog.names.sub">V\u00e4ndkort \u2013 svenska, latin, engelska</span></span>
+          <span class="pc-go">&#9654;</span>
+        </button>
         <h3 class="prog-h" data-i18n="prog.heat">Var du \u00e4r svagast</h3>
         <div id="heatmap"></div>
       </div>
@@ -1368,6 +1454,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
       <span class="nav-ind"></span>
       <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6"/><line x1="15.5" y1="15.5" x2="20" y2="20"/><line x1="11" y1="8.4" x2="11" y2="11.6"/><line x1="9.4" y1="10" x2="12.6" y2="10"/></svg>
       <span data-i18n="nav.spotter">SPOTTER</span>
+    </button>
+    <button class="nav-btn" data-action="names" type="button">
+      <span class="nav-ind"></span>
+      <svg viewBox="0 0 24 24" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="6.5" width="13" height="11" rx="1.8"/><path d="M7.5 4.2h9.7A2.8 2.8 0 0 1 20 7v9.6"/></svg>
+      <span data-i18n="nav.names">NAMN</span>
     </button>
     <button class="nav-btn" data-page="page-bone" type="button">
       <span class="nav-ind"></span>
@@ -1697,8 +1788,8 @@ window.RIBCLASS = {
 (function(){
   "use strict";
 
-  var STRINGS = { sv:{"nav.atlas": "ATLAS", "nav.ben": "BEN", "nav.spotter": "SPOTTER", "view.dorsal": "OVANIFR\u00c5N", "view.lateral": "FR\u00c5N SIDAN", "view.above": "OVANIFR\u00c5N", "detail.pick": "DETALJ", "detail.title": "V\u00e4lj vy", "detail.body": "Hela kroppen", "detail.body.sub": "Fram och bak", "detail.count": "{n} ben i vyn", "detail.side.left": "v\u00e4nster", "detail.side.right": "h\u00f6ger", "detail.hidden": "skyms i denna vy", "about.fig": "Illustration. Appens planscher \u00e4r renderade ur 3D-modellen.", "wel.sub": "Skelettatlas och spotter-quiz", "wel.go": "Kom ig\u00e5ng", "set.group.start": "Startsida", "start.always": "Visa varje g\u00e5ng", "start.always.sub": "Startsidan visas n\u00e4r appen \u00f6ppnas", "start.once": "Bara f\u00f6rsta g\u00e5ngen", "start.once.sub": "Hoppa direkt till atlasen", "mer.start": "Startsidan", "gap.foot5": "Lillt\u00e5ns mellanfalang saknas i 3D-modellen \u2013 den \u00e4r ofta sammanvuxen med ytterfalangen.", "detail.note": "{r} \u2013 n\u00e4rbild renderad ur 3D-modellen.", "detail.note.side": "{r}, {s} sida \u2013 n\u00e4rbild ur 3D-modellen. Andra sidan finns i kroppsvyn.", "nav.progress": "FRAMSTEG", "sheet.unverified": "brosk \u2013 ej i quiz", "prog.title": "Framsteg", "prog.heat": "Var du \u00e4r svagast", "prog.heat.none": "Ingen statistik \u00e4n \u2013 k\u00f6r en runda i Spotter.", "prog.cram": "10-minuters plugg", "prog.cram.sub": "Adaptivt \u2013 v\u00e4ljer det du kan s\u00e4mst", "prog.landmark": "Landm\u00e4rkes-spotter", "prog.landmark.sub": "Inte tillg\u00e4nglig: landm\u00e4rkena \u00e4r inte anatomiskt granskade \u00e4n.", "prog.more": "Mer", "prog.more.sub": "Guide, leder, inst\u00e4llningar, om appen", "cram.left": "{m}:{s} kvar \u00b7 {n} r\u00e4tt", "cram.done": "Tiden \u00e4r ute", "heat.cell": "{p}%", "heat.unseen": "\u2013", "nav.quiz": "QUIZ", "nav.mina": "MINA", "nav.mer": "MER", "search.placeholder": "Sök ben – svenska, latin, engelska", "sel.open": "VISA", "bone.empty.title": "Inget ben valt", "bone.empty.body": "Tryck på ett ben i atlasen, eller sök på namn, så visas det här.", "bone.overview": "Översikt", "bone.landmarks": "Detaljer att kunna", "bone.chip.partof": "del av ", "bone.chip.count": "{n} st i kroppen", "bone.chip.paired": "parigt", "bone.chip.single": "oparigt", "bone.note.hidden": "Ritas inte i atlasen: benet ligger djupt eller på baksidan och syns inte i en bild framifrån. Det går att söka fram här.", "bone\.note\.schematic": "Konturen \u00e4r benets verkliga silhuett i den h\u00e4r vyn, renderad ur en 3D-modell. Delar som d\u00f6ljs av andra ben syns inte \u2013 byt vy f\u00f6r att se mer av benet.", "bone.note.factslang": "Faktatexterna är på svenska.", "search.nohit.title": "Ingen träff", "search.nohit.body": "Prova svenska, latin eller engelska – t.ex. lårben, femur, skull.", "search.flag.hidden": "visas inte i atlasen", "mina.title": "Mina ben", "mina.count": "{n} av {m}", "mina.sub": "ben du har öppnat", "mina.sub.empty": "ben du har öppnat – börja i atlasen", "mina.empty.title": "Inga ben öppnade än", "mina.empty.body": "Tryck på ett ben i atlasen och öppna det, så hamnar det här.", "mer.title": "Mer", "mer.settings": "Inställningar", "mer.settings.sub": "Tema, språk och namn", "mer.about": "Om BoneAtlas", "mer.about.sub": "Version, källor och förbehåll", "set.title": "Inställningar", "set.group.ui": "Språk / Language", "set.group.theme": "Tema", "set.group.names": "Namn som visas först", "set.group.reset": "Studerade ben", "set.reset": "Nollställ studerade ben", "set.reset.confirm": "Tryck igen för att bekräfta", "theme.auto": "Följ systemet", "theme.auto.sub": "Byter när telefonen byter", "theme.light": "Ljust", "theme.light.sub": "Alltid ljus bakgrund", "theme.dark": "Mörkt", "theme.dark.sub": "Alltid mörk bakgrund", "ui.sv": "Svenska", "ui.sv.sub": "Gränssnittet på svenska", "ui.en": "English", "ui.en.sub": "Interface in English", "names.sv": "Svenska", "names.sv.sub": "Lårben · Os femoris · Femur", "names.la": "Latin", "names.la.sub": "Os femoris · Lårben · Femur", "names.en": "Engelska", "names.en.sub": "Femur · Lårben · Os femoris", "about.version": "Version", "about.bones": "Ben i kroppen", "about.entries": "Uppslag i appen", "about.drawn": "Ritade i atlasen", "about.offline": "Fungerar offline", "about.yes": "Ja", "about.caveats": "Förbehåll", "about\.p1": "Atlasen bygger p\u00e5 3D-modeller fr\u00e5n BodyParts3D. Varje ben \u00e4r ett eget objekt med sitt anatomiska namn h\u00e4mtat ur k\u00e4llan, och konturen i bilden \u00e4r benets faktiska silhuett i den vyn \u2013 inte en f\u00f6renklad form. Ett ben som inte syns i en vy \u00e4r dolt bakom andra ben och g\u00e5r d\u00e4rf\u00f6r inte att trycka p\u00e5 d\u00e4r; byt vy eller s\u00f6k p\u00e5 namnet. Revbensbrosk och mellankotskivor visas ocks\u00e5, men de \u00e4r brosk och r\u00e4knas inte som ben.", "about.p2": "Vissa ben ritas inte alls: de ligger djupt i skallen, i mellanörat eller på kroppens baksida och syns inte i en bild framifrån. De går ändå att söka fram.", "about.p3": "Antalet 206 gäller en färdigvuxen skelett. Barn har fler ben eftersom flera växer ihop först i tjugoårsåldern – till exempel höftbenet, korsbenet och skallens delar.", "about.p4": "Appen är ett studiestöd, inte ett medicinskt uppslagsverk. Kontrollera alltid mot kurslitteraturen inför tentamen.", "about.factslang": "Faktatexterna följer det valda gränssnittsspråket. Svenska är originalet som granskats anatomiskt; den engelska texten är översatt därifrån.", "about.imgcredit.h": "Skelettbild", "about.imgcredit": "Skelettbilder: BodyParts3D, \u00a9 The Database Center for Life Science (DBCLS), licensierad under CC Attribution-Share Alike 2.1 Japan. Bilderna \u00e4r renderade och bearbetade f\u00f6r denna app.", "toast.quiz": "Quiz kommer i nästa version.", "toast.reset": "Studerade ben nollställda.", "mer.sub.theme.auto": "Systemtema", "mer.sub.theme.dark": "Mörkt tema", "mer.sub.theme.light": "Ljust tema", "mer.sub.names.sv": "svenska", "mer.sub.names.la": "latin", "mer.sub.names.en": "engelska", "mer.sub.namesfirst": "{x} först", "view.front": "FRAM", "view.back": "BAK", "view.switch": "Byt vy", "view.front": "FRONT", "view.back": "BACK", "view.switch": "Switch view", "quiz.title": "Quiz", "quiz.q": "Vilket ben är markerat?", "quiz.of": "Fråga {n} av {m}", "quiz.score": "{n} av {m} rätt", "quiz.correct": "Rätt!", "quiz.wrong": "Fel – rätt svar: {a}", "quiz.next": "Nästa", "quiz.finish": "Se resultat", "quiz.again": "Ny omgång", "quiz.close": "Stäng", "quiz.done.title": "Omgång klar", "quiz.missed": "Repetera de här:", "quiz.allright": "Alla rätt – snyggt!", "quiz.taptostudy": "Tryck på ett ben för att öppna det.", "quiz.start": "Starta quiz", "quiz.len": "{n} frågor", "mina.quiz.head": "Quiz", "mina.quiz.acc": "{p}% rätt av {n} svar", "mina.quiz.none": "Inga quizsvar än", "mina.quiz.weak": "Svagast: {r}", "region.skull": "Skalle", "region.neck": "Hals", "region.spine": "Ryggrad", "region.thorax": "Bröstkorg", "region.shoulder": "Skuldra", "region.arm": "Arm", "region.hand": "Hand", "region.pelvis": "Bäcken", "region.leg": "Ben", "region.foot": "Fot", "browse.back": "\u2039 Alla ben", "mer.guide": "Skelettguide", "mer.guide.sub": "Faktadel \u2013 l\u00e4s om skelettet", "guide.seebones": "Visa benen i {x} \u203a", "browse.showall": "\u2039 Visa alla regioner", "quiz.readguide": "L\u00e4s guiden om {x}", "mer.joints": "Leder", "mer.joints.sub": "Axel, armb\u00e5ge, h\u00f6ft, kn\u00e4 och fler", "joints.bones": "Ben som bildar leden", "browse.by.region": "Region", "browse.by.class": "Bentyp", "browse.by.rib": "Revben", "fig.fromatlas": "Utsnitt ur atlasbilden", "bone.note.unverified": "Detta \u00e4r brosk, inte ben. Det visas i atlasen men r\u00e4knas inte som ett ben och st\u00e4lls inte i quizet."},
-    en:{"nav.atlas": "ATLAS", "nav.ben": "BONES", "nav.spotter": "SPOTTER", "view.dorsal": "FROM ABOVE", "view.lateral": "FROM THE SIDE", "view.above": "FROM ABOVE", "detail.pick": "DETAIL", "detail.title": "Choose a view", "detail.body": "Whole body", "detail.body.sub": "Front and back", "detail.count": "{n} bones in view", "detail.side.left": "left", "detail.side.right": "right", "detail.hidden": "hidden in this view", "about.fig": "Illustration. The atlas plates are rendered from the 3-D model.", "wel.sub": "Skeleton atlas and spotter quiz", "wel.go": "Get started", "set.group.start": "Start screen", "start.always": "Show every time", "start.always.sub": "The start screen opens with the app", "start.once": "First launch only", "start.once.sub": "Go straight to the atlas", "mer.start": "Start screen", "gap.foot5": "The little toe\u2019s middle phalanx is absent from the 3-D model \u2013 it is commonly fused with the distal phalanx.", "detail.note": "{r} \u2013 close-up rendered from the 3-D model.", "detail.note.side": "{r}, {s} side \u2013 close-up from the 3-D model. The other side is in the body view.", "nav.progress": "PROGRESS", "sheet.unverified": "cartilage \u2013 not in quiz", "prog.title": "Progress", "prog.heat": "Where you are weakest", "prog.heat.none": "No statistics yet \u2013 run a round in Spotter.", "prog.cram": "10-minute cram", "prog.cram.sub": "Adaptive \u2013 picks what you know least well", "prog.landmark": "Landmark spotter", "prog.landmark.sub": "Not available: the landmarks have not been anatomically reviewed yet.", "prog.more": "More", "prog.more.sub": "Guide, joints, settings, about", "cram.left": "{m}:{s} left \u00b7 {n} correct", "cram.done": "Time is up", "heat.cell": "{p}%", "heat.unseen": "\u2013", "nav.quiz": "QUIZ", "nav.mina": "MINE", "nav.mer": "MORE", "search.placeholder": "Search bones – Swedish, Latin, English", "sel.open": "OPEN", "bone.empty.title": "No bone selected", "bone.empty.body": "Tap a bone in the atlas, or search by name, and it will show here.", "bone.overview": "Overview", "bone.landmarks": "Landmarks to know", "bone.chip.partof": "part of ", "bone.chip.count": "{n} in the body", "bone.chip.paired": "paired", "bone.chip.single": "single", "bone.note.hidden": "Not drawn in the atlas: this bone sits deep or on the back of the body and is not visible in a front view. You can still find it by search.", "bone\.note\.schematic": "The outline is this bone\u2019s true silhouette in this view, rendered from a 3-D model. Parts hidden behind other bones are not shown \u2013 switch view to see more of the bone.", "bone.note.factslang": "The fact texts are in Swedish.", "search.nohit.title": "No match", "search.nohit.body": "Try Swedish, Latin or English – e.g. lårben, femur, skull.", "search.flag.hidden": "not shown in the atlas", "mina.title": "My bones", "mina.count": "{n} of {m}", "mina.sub": "bones you have opened", "mina.sub.empty": "bones you have opened – start in the atlas", "mina.empty.title": "No bones opened yet", "mina.empty.body": "Tap a bone in the atlas and open it, and it will appear here.", "mer.title": "More", "mer.settings": "Settings", "mer.settings.sub": "Theme, language and names", "mer.about": "About BoneAtlas", "mer.about.sub": "Version, sources and caveats", "set.title": "Settings", "set.group.ui": "Språk / Language", "set.group.theme": "Theme", "set.group.names": "Name shown first", "set.group.reset": "Studied bones", "set.reset": "Reset studied bones", "set.reset.confirm": "Tap again to confirm", "theme.auto": "Follow system", "theme.auto.sub": "Switches when the phone switches", "theme.light": "Light", "theme.light.sub": "Always light background", "theme.dark": "Dark", "theme.dark.sub": "Always dark background", "ui.sv": "Svenska", "ui.sv.sub": "Gränssnittet på svenska", "ui.en": "English", "ui.en.sub": "Interface in English", "names.sv": "Swedish", "names.sv.sub": "Lårben · Os femoris · Femur", "names.la": "Latin", "names.la.sub": "Os femoris · Lårben · Femur", "names.en": "English", "names.en.sub": "Femur · Lårben · Os femoris", "about.version": "Version", "about.bones": "Bones in the body", "about.entries": "Entries in the app", "about.drawn": "Drawn in the atlas", "about.offline": "Works offline", "about.yes": "Yes", "about.caveats": "Caveats", "about\.p1": "The atlas is built from BodyParts3D 3-D models. Every bone is its own object with its anatomical name taken from the source, and the outline you see is that bone\u2019s actual silhouette in that view, not a simplified shape. A bone that is missing from a view is hidden behind others and cannot be tapped there; switch view or search by name. Costal cartilage and intervertebral discs are shown too, but they are cartilage and are not counted as bones.", "about.p2": "Some bones are not drawn at all: they sit deep in the skull, in the middle ear or on the back of the body and are not visible in a front view. They can still be found by search.", "about.p3": "The number 206 applies to a fully grown skeleton. Children have more bones because several fuse only in their twenties – for example the hip bone, the sacrum and parts of the skull.", "about.p4": "This app is a study aid, not a medical reference. Always check against your course material before an exam.", "about.factslang": "The fact texts follow the selected interface language. Swedish is the anatomically reviewed original; the English text is translated from it.", "about.imgcredit.h": "Skeleton image", "about.imgcredit": "Skeleton images: BodyParts3D, \u00a9 The Database Center for Life Science (DBCLS), licensed under CC Attribution-Share Alike 2.1 Japan. The images have been rendered and modified for this app.", "toast.quiz": "Quiz is coming in the next version.", "toast.reset": "Studied bones reset.", "mer.sub.theme.auto": "System theme", "mer.sub.theme.dark": "Dark theme", "mer.sub.theme.light": "Light theme", "mer.sub.names.sv": "Swedish", "mer.sub.names.la": "Latin", "mer.sub.names.en": "English", "mer.sub.namesfirst": "{x} first", "quiz.title": "Quiz", "view.front": "FRONT", "view.back": "BACK", "view.switch": "Switch view", "quiz.q": "Which bone is highlighted?", "quiz.of": "Question {n} of {m}", "quiz.score": "{n} of {m} correct", "quiz.correct": "Correct!", "quiz.wrong": "Wrong – answer: {a}", "quiz.next": "Next", "quiz.finish": "See result", "quiz.again": "New round", "quiz.close": "Close", "quiz.done.title": "Round complete", "quiz.missed": "Review these:", "quiz.allright": "All correct – nice!", "quiz.taptostudy": "Tap a bone to open it.", "quiz.start": "Start quiz", "quiz.len": "{n} questions", "mina.quiz.head": "Quiz", "mina.quiz.acc": "{p}% correct of {n} answers", "mina.quiz.none": "No quiz answers yet", "mina.quiz.weak": "Weakest: {r}", "region.skull": "Skull", "region.neck": "Neck", "region.spine": "Spine", "region.thorax": "Thorax", "region.shoulder": "Shoulder", "region.arm": "Arm", "region.hand": "Hand", "region.pelvis": "Pelvis", "region.leg": "Leg", "region.foot": "Foot", "browse.back": "\u2039 All bones", "mer.guide": "Skeleton guide", "mer.guide.sub": "Reference reading about the skeleton", "guide.seebones": "Show the bones of the {x} \u203a", "browse.showall": "\u2039 Show all regions", "quiz.readguide": "Read the guide on the {x}", "mer.joints": "Joints", "mer.joints.sub": "Shoulder, elbow, hip, knee and more", "joints.bones": "Bones forming the joint", "browse.by.region": "Region", "browse.by.class": "Bone type", "browse.by.rib": "Ribs", "fig.fromatlas": "Detail from the atlas image", "bone.note.unverified": "This is cartilage, not bone. It is shown in the atlas but is not counted as a bone and is not asked in the quiz."} };
+  var STRINGS = { sv:{"nav.atlas": "ATLAS", "nav.ben": "BEN", "nav.spotter": "SPOTTER", "view.dorsal": "OVANIFR\u00c5N", "view.lateral": "FR\u00c5N SIDAN", "view.above": "OVANIFR\u00c5N", "detail.pick": "DETALJ", "detail.title": "V\u00e4lj vy", "detail.body": "Hela kroppen", "detail.body.sub": "Fram och bak", "detail.count": "{n} ben i vyn", "detail.side.left": "v\u00e4nster", "detail.side.right": "h\u00f6ger", "detail.hidden": "skyms i denna vy", "about.fig": "Illustration. Appens planscher \u00e4r renderade ur 3D-modellen.", "wel.sub": "Skelettatlas och spotter-quiz", "wel.go": "Kom ig\u00e5ng", "prog.names": "Namntr\u00e4ning", "prog.names.sub": "V\u00e4ndkort \u2013 svenska, latin, engelska", "names.quit": "\u2039 Avsluta", "names.show": "Visa svar", "names.yes": "Kunde", "names.no": "Kunde inte", "names.again": "Ny omg\u00e5ng", "names.of": "Kort {n} av {m}", "names.done": "Omg\u00e5ng klar", "names.score": "{n} av {m} kunde du", "names.lang.sv": "Svenska", "names.lang.la": "Latin", "names.lang.en": "Engelska", "names.ask": "Vad heter det p\u00e5 {x}?", "names.stat": "Namntr\u00e4ning: {p}% av {n} kort", "names.stat.none": "Namntr\u00e4ning: inga kort \u00e4n", "set.group.start": "Startsida", "start.always": "Visa varje g\u00e5ng", "start.always.sub": "Startsidan visas n\u00e4r appen \u00f6ppnas", "start.once": "Bara f\u00f6rsta g\u00e5ngen", "start.once.sub": "Hoppa direkt till atlasen", "mer.start": "Startsidan", "gap.foot5": "Lillt\u00e5ns mellanfalang saknas i 3D-modellen \u2013 den \u00e4r ofta sammanvuxen med ytterfalangen.", "detail.note": "{r} \u2013 n\u00e4rbild renderad ur 3D-modellen.", "detail.note.side": "{r}, {s} sida \u2013 n\u00e4rbild ur 3D-modellen. Andra sidan finns i kroppsvyn.", "nav.names": "NAMN", "nav.progress": "FRAMSTEG", "sheet.unverified": "brosk \u2013 ej i quiz", "prog.title": "Framsteg", "prog.heat": "Var du \u00e4r svagast", "prog.heat.none": "Ingen statistik \u00e4n \u2013 k\u00f6r en runda i Spotter.", "prog.cram": "10-minuters plugg", "prog.cram.sub": "Adaptivt \u2013 v\u00e4ljer det du kan s\u00e4mst", "prog.landmark": "Landm\u00e4rkes-spotter", "prog.landmark.sub": "Inte tillg\u00e4nglig: landm\u00e4rkena \u00e4r inte anatomiskt granskade \u00e4n.", "prog.more": "Mer", "prog.more.sub": "Guide, leder, inst\u00e4llningar, om appen", "cram.left": "{m}:{s} kvar \u00b7 {n} r\u00e4tt", "cram.done": "Tiden \u00e4r ute", "heat.cell": "{p}%", "heat.unseen": "\u2013", "nav.quiz": "QUIZ", "nav.mina": "MINA", "nav.mer": "MER", "search.placeholder": "Sök ben – svenska, latin, engelska", "sel.open": "VISA", "bone.empty.title": "Inget ben valt", "bone.empty.body": "Tryck på ett ben i atlasen, eller sök på namn, så visas det här.", "bone.overview": "Översikt", "bone.landmarks": "Detaljer att kunna", "bone.chip.partof": "del av ", "bone.chip.count": "{n} st i kroppen", "bone.chip.paired": "parigt", "bone.chip.single": "oparigt", "bone.note.hidden": "Ritas inte i atlasen: benet ligger djupt eller på baksidan och syns inte i en bild framifrån. Det går att söka fram här.", "bone\.note\.schematic": "Konturen \u00e4r benets verkliga silhuett i den h\u00e4r vyn, renderad ur en 3D-modell. Delar som d\u00f6ljs av andra ben syns inte \u2013 byt vy f\u00f6r att se mer av benet.", "bone.note.factslang": "Faktatexterna är på svenska.", "search.nohit.title": "Ingen träff", "search.nohit.body": "Prova svenska, latin eller engelska – t.ex. lårben, femur, skull.", "search.flag.hidden": "visas inte i atlasen", "mina.title": "Mina ben", "mina.count": "{n} av {m}", "mina.sub": "ben du har öppnat", "mina.sub.empty": "ben du har öppnat – börja i atlasen", "mina.empty.title": "Inga ben öppnade än", "mina.empty.body": "Tryck på ett ben i atlasen och öppna det, så hamnar det här.", "mer.title": "Mer", "mer.settings": "Inställningar", "mer.settings.sub": "Tema, språk och namn", "mer.about": "Om BoneAtlas", "mer.about.sub": "Version, källor och förbehåll", "set.title": "Inställningar", "set.group.ui": "Språk / Language", "set.group.theme": "Tema", "set.group.names": "Namn som visas först", "set.group.reset": "Studerade ben", "set.reset": "Nollställ studerade ben", "set.reset.confirm": "Tryck igen för att bekräfta", "theme.auto": "Följ systemet", "theme.auto.sub": "Byter när telefonen byter", "theme.light": "Ljust", "theme.light.sub": "Alltid ljus bakgrund", "theme.dark": "Mörkt", "theme.dark.sub": "Alltid mörk bakgrund", "ui.sv": "Svenska", "ui.sv.sub": "Gränssnittet på svenska", "ui.en": "English", "ui.en.sub": "Interface in English", "names.sv": "Svenska", "names.sv.sub": "Lårben · Os femoris · Femur", "names.la": "Latin", "names.la.sub": "Os femoris · Lårben · Femur", "names.en": "Engelska", "names.en.sub": "Femur · Lårben · Os femoris", "about.version": "Version", "about.bones": "Ben i kroppen", "about.entries": "Uppslag i appen", "about.drawn": "Ritade i atlasen", "about.offline": "Fungerar offline", "about.yes": "Ja", "about.caveats": "Förbehåll", "about\.p1": "Atlasen bygger p\u00e5 3D-modeller fr\u00e5n BodyParts3D. Varje ben \u00e4r ett eget objekt med sitt anatomiska namn h\u00e4mtat ur k\u00e4llan, och konturen i bilden \u00e4r benets faktiska silhuett i den vyn \u2013 inte en f\u00f6renklad form. Ett ben som inte syns i en vy \u00e4r dolt bakom andra ben och g\u00e5r d\u00e4rf\u00f6r inte att trycka p\u00e5 d\u00e4r; byt vy eller s\u00f6k p\u00e5 namnet. Revbensbrosk och mellankotskivor visas ocks\u00e5, men de \u00e4r brosk och r\u00e4knas inte som ben.", "about.p2": "Vissa ben ritas inte alls: de ligger djupt i skallen, i mellanörat eller på kroppens baksida och syns inte i en bild framifrån. De går ändå att söka fram.", "about.p3": "Antalet 206 gäller en färdigvuxen skelett. Barn har fler ben eftersom flera växer ihop först i tjugoårsåldern – till exempel höftbenet, korsbenet och skallens delar.", "about.p4": "Appen är ett studiestöd, inte ett medicinskt uppslagsverk. Kontrollera alltid mot kurslitteraturen inför tentamen.", "about.factslang": "Faktatexterna följer det valda gränssnittsspråket. Svenska är originalet som granskats anatomiskt; den engelska texten är översatt därifrån.", "about.imgcredit.h": "Skelettbild", "about.imgcredit": "Skelettbilder: BodyParts3D, \u00a9 The Database Center for Life Science (DBCLS), licensierad under CC Attribution-Share Alike 2.1 Japan. Bilderna \u00e4r renderade och bearbetade f\u00f6r denna app.", "toast.quiz": "Quiz kommer i nästa version.", "toast.reset": "Studerade ben nollställda.", "mer.sub.theme.auto": "Systemtema", "mer.sub.theme.dark": "Mörkt tema", "mer.sub.theme.light": "Ljust tema", "mer.sub.names.sv": "svenska", "mer.sub.names.la": "latin", "mer.sub.names.en": "engelska", "mer.sub.namesfirst": "{x} först", "view.front": "FRAM", "view.back": "BAK", "view.switch": "Byt vy", "view.front": "FRONT", "view.back": "BACK", "view.switch": "Switch view", "quiz.title": "Quiz", "quiz.q": "Vilket ben är markerat?", "quiz.of": "Fråga {n} av {m}", "quiz.score": "{n} av {m} rätt", "quiz.correct": "Rätt!", "quiz.wrong": "Fel – rätt svar: {a}", "quiz.next": "Nästa", "quiz.finish": "Se resultat", "quiz.again": "Ny omgång", "quiz.close": "Stäng", "quiz.done.title": "Omgång klar", "quiz.missed": "Repetera de här:", "quiz.allright": "Alla rätt – snyggt!", "quiz.taptostudy": "Tryck på ett ben för att öppna det.", "quiz.start": "Starta quiz", "quiz.len": "{n} frågor", "mina.quiz.head": "Quiz", "mina.quiz.acc": "{p}% rätt av {n} svar", "mina.quiz.none": "Inga quizsvar än", "mina.quiz.weak": "Svagast: {r}", "region.skull": "Skalle", "region.neck": "Hals", "region.spine": "Ryggrad", "region.thorax": "Bröstkorg", "region.shoulder": "Skuldra", "region.arm": "Arm", "region.hand": "Hand", "region.pelvis": "Bäcken", "region.leg": "Ben", "region.foot": "Fot", "browse.back": "\u2039 Alla ben", "mer.guide": "Skelettguide", "mer.guide.sub": "Faktadel \u2013 l\u00e4s om skelettet", "guide.seebones": "Visa benen i {x} \u203a", "browse.showall": "\u2039 Visa alla regioner", "quiz.readguide": "L\u00e4s guiden om {x}", "mer.joints": "Leder", "mer.joints.sub": "Axel, armb\u00e5ge, h\u00f6ft, kn\u00e4 och fler", "joints.bones": "Ben som bildar leden", "browse.by.region": "Region", "browse.by.class": "Bentyp", "browse.by.rib": "Revben", "fig.fromatlas": "Utsnitt ur atlasbilden", "bone.note.unverified": "Detta \u00e4r brosk, inte ben. Det visas i atlasen men r\u00e4knas inte som ett ben och st\u00e4lls inte i quizet."},
+    en:{"nav.atlas": "ATLAS", "nav.ben": "BONES", "nav.spotter": "SPOTTER", "view.dorsal": "FROM ABOVE", "view.lateral": "FROM THE SIDE", "view.above": "FROM ABOVE", "detail.pick": "DETAIL", "detail.title": "Choose a view", "detail.body": "Whole body", "detail.body.sub": "Front and back", "detail.count": "{n} bones in view", "detail.side.left": "left", "detail.side.right": "right", "detail.hidden": "hidden in this view", "about.fig": "Illustration. The atlas plates are rendered from the 3-D model.", "wel.sub": "Skeleton atlas and spotter quiz", "wel.go": "Get started", "prog.names": "Name drill", "prog.names.sub": "Flashcards \u2013 Swedish, Latin, English", "names.quit": "\u2039 Quit", "names.show": "Show answer", "names.yes": "Knew it", "names.no": "Did not know", "names.again": "New round", "names.of": "Card {n} of {m}", "names.done": "Round complete", "names.score": "You knew {n} of {m}", "names.lang.sv": "Swedish", "names.lang.la": "Latin", "names.lang.en": "English", "names.ask": "What is it in {x}?", "names.stat": "Name drill: {p}% of {n} cards", "names.stat.none": "Name drill: no cards yet", "set.group.start": "Start screen", "start.always": "Show every time", "start.always.sub": "The start screen opens with the app", "start.once": "First launch only", "start.once.sub": "Go straight to the atlas", "mer.start": "Start screen", "gap.foot5": "The little toe\u2019s middle phalanx is absent from the 3-D model \u2013 it is commonly fused with the distal phalanx.", "detail.note": "{r} \u2013 close-up rendered from the 3-D model.", "detail.note.side": "{r}, {s} side \u2013 close-up from the 3-D model. The other side is in the body view.", "nav.names": "NAMES", "nav.progress": "PROGRESS", "sheet.unverified": "cartilage \u2013 not in quiz", "prog.title": "Progress", "prog.heat": "Where you are weakest", "prog.heat.none": "No statistics yet \u2013 run a round in Spotter.", "prog.cram": "10-minute cram", "prog.cram.sub": "Adaptive \u2013 picks what you know least well", "prog.landmark": "Landmark spotter", "prog.landmark.sub": "Not available: the landmarks have not been anatomically reviewed yet.", "prog.more": "More", "prog.more.sub": "Guide, joints, settings, about", "cram.left": "{m}:{s} left \u00b7 {n} correct", "cram.done": "Time is up", "heat.cell": "{p}%", "heat.unseen": "\u2013", "nav.quiz": "QUIZ", "nav.mina": "MINE", "nav.mer": "MORE", "search.placeholder": "Search bones – Swedish, Latin, English", "sel.open": "OPEN", "bone.empty.title": "No bone selected", "bone.empty.body": "Tap a bone in the atlas, or search by name, and it will show here.", "bone.overview": "Overview", "bone.landmarks": "Landmarks to know", "bone.chip.partof": "part of ", "bone.chip.count": "{n} in the body", "bone.chip.paired": "paired", "bone.chip.single": "single", "bone.note.hidden": "Not drawn in the atlas: this bone sits deep or on the back of the body and is not visible in a front view. You can still find it by search.", "bone\.note\.schematic": "The outline is this bone\u2019s true silhouette in this view, rendered from a 3-D model. Parts hidden behind other bones are not shown \u2013 switch view to see more of the bone.", "bone.note.factslang": "The fact texts are in Swedish.", "search.nohit.title": "No match", "search.nohit.body": "Try Swedish, Latin or English – e.g. lårben, femur, skull.", "search.flag.hidden": "not shown in the atlas", "mina.title": "My bones", "mina.count": "{n} of {m}", "mina.sub": "bones you have opened", "mina.sub.empty": "bones you have opened – start in the atlas", "mina.empty.title": "No bones opened yet", "mina.empty.body": "Tap a bone in the atlas and open it, and it will appear here.", "mer.title": "More", "mer.settings": "Settings", "mer.settings.sub": "Theme, language and names", "mer.about": "About BoneAtlas", "mer.about.sub": "Version, sources and caveats", "set.title": "Settings", "set.group.ui": "Språk / Language", "set.group.theme": "Theme", "set.group.names": "Name shown first", "set.group.reset": "Studied bones", "set.reset": "Reset studied bones", "set.reset.confirm": "Tap again to confirm", "theme.auto": "Follow system", "theme.auto.sub": "Switches when the phone switches", "theme.light": "Light", "theme.light.sub": "Always light background", "theme.dark": "Dark", "theme.dark.sub": "Always dark background", "ui.sv": "Svenska", "ui.sv.sub": "Gränssnittet på svenska", "ui.en": "English", "ui.en.sub": "Interface in English", "names.sv": "Swedish", "names.sv.sub": "Lårben · Os femoris · Femur", "names.la": "Latin", "names.la.sub": "Os femoris · Lårben · Femur", "names.en": "English", "names.en.sub": "Femur · Lårben · Os femoris", "about.version": "Version", "about.bones": "Bones in the body", "about.entries": "Entries in the app", "about.drawn": "Drawn in the atlas", "about.offline": "Works offline", "about.yes": "Yes", "about.caveats": "Caveats", "about\.p1": "The atlas is built from BodyParts3D 3-D models. Every bone is its own object with its anatomical name taken from the source, and the outline you see is that bone\u2019s actual silhouette in that view, not a simplified shape. A bone that is missing from a view is hidden behind others and cannot be tapped there; switch view or search by name. Costal cartilage and intervertebral discs are shown too, but they are cartilage and are not counted as bones.", "about.p2": "Some bones are not drawn at all: they sit deep in the skull, in the middle ear or on the back of the body and are not visible in a front view. They can still be found by search.", "about.p3": "The number 206 applies to a fully grown skeleton. Children have more bones because several fuse only in their twenties – for example the hip bone, the sacrum and parts of the skull.", "about.p4": "This app is a study aid, not a medical reference. Always check against your course material before an exam.", "about.factslang": "The fact texts follow the selected interface language. Swedish is the anatomically reviewed original; the English text is translated from it.", "about.imgcredit.h": "Skeleton image", "about.imgcredit": "Skeleton images: BodyParts3D, \u00a9 The Database Center for Life Science (DBCLS), licensed under CC Attribution-Share Alike 2.1 Japan. The images have been rendered and modified for this app.", "toast.quiz": "Quiz is coming in the next version.", "toast.reset": "Studied bones reset.", "mer.sub.theme.auto": "System theme", "mer.sub.theme.dark": "Dark theme", "mer.sub.theme.light": "Light theme", "mer.sub.names.sv": "Swedish", "mer.sub.names.la": "Latin", "mer.sub.names.en": "English", "mer.sub.namesfirst": "{x} first", "quiz.title": "Quiz", "view.front": "FRONT", "view.back": "BACK", "view.switch": "Switch view", "quiz.q": "Which bone is highlighted?", "quiz.of": "Question {n} of {m}", "quiz.score": "{n} of {m} correct", "quiz.correct": "Correct!", "quiz.wrong": "Wrong – answer: {a}", "quiz.next": "Next", "quiz.finish": "See result", "quiz.again": "New round", "quiz.close": "Close", "quiz.done.title": "Round complete", "quiz.missed": "Review these:", "quiz.allright": "All correct – nice!", "quiz.taptostudy": "Tap a bone to open it.", "quiz.start": "Start quiz", "quiz.len": "{n} questions", "mina.quiz.head": "Quiz", "mina.quiz.acc": "{p}% correct of {n} answers", "mina.quiz.none": "No quiz answers yet", "mina.quiz.weak": "Weakest: {r}", "region.skull": "Skull", "region.neck": "Neck", "region.spine": "Spine", "region.thorax": "Thorax", "region.shoulder": "Shoulder", "region.arm": "Arm", "region.hand": "Hand", "region.pelvis": "Pelvis", "region.leg": "Leg", "region.foot": "Foot", "browse.back": "\u2039 All bones", "mer.guide": "Skeleton guide", "mer.guide.sub": "Reference reading about the skeleton", "guide.seebones": "Show the bones of the {x} \u203a", "browse.showall": "\u2039 Show all regions", "quiz.readguide": "Read the guide on the {x}", "mer.joints": "Joints", "mer.joints.sub": "Shoulder, elbow, hip, knee and more", "joints.bones": "Bones forming the joint", "browse.by.region": "Region", "browse.by.class": "Bone type", "browse.by.rib": "Ribs", "fig.fromatlas": "Detail from the atlas image", "bone.note.unverified": "This is cartilage, not bone. It is shown in the atlas but is not counted as a bone and is not asked in the quiz."} };
 
   function t(key, vars){
     var lang = STRINGS[settings.ui] ? settings.ui : "sv";
@@ -1825,7 +1916,7 @@ window.RIBCLASS = {
   var selectedId = null;
   var studied = {};
   var toastTimer = null;
-  var APP_VERSION = "5.5.1";
+  var APP_VERSION = "5.7.1";
   var settings = { theme:"auto", primary:"sv", ui:"sv", start: "always" };
   var resetArmed = false;
 
@@ -1910,10 +2001,13 @@ window.RIBCLASS = {
     }
     // MER stays lit while you are inside any of its sub-pages
     var MER_PAGES = { "page-mer":1, "page-settings":1, "page-about":1, "page-guide":1, "page-guide-article":1, "page-joints":1 };
-    var btns = document.querySelectorAll(".nav-btn[data-page]");
+    // ALL nav buttons, not just data-page ones: the name drill is a data-action
+    // tab and still has to light up while its page is open
+    var btns = document.querySelectorAll(".nav-btn");
     for (var j = 0; j < btns.length; j++){
       var t = btns[j].getAttribute("data-page");
-      var on = (t === pageId) || (t === "page-mer" && MER_PAGES[pageId] === 1);
+      var on = (t === pageId) || (t === "page-mer" && MER_PAGES[pageId] === 1) ||
+               (btns[j].getAttribute("data-action") === "names" && pageId === "page-names");
       btns[j].className = "nav-btn" + (on ? " active" : "");
     }
     if (pageId === "page-atlas" && map){
@@ -3061,6 +3155,19 @@ window.RIBCLASS = {
       mq.textContent = line;
     }
 
+    var ntot = 0, ncor = 0, kk;
+    for (kk in nameStats){
+      if (Object.prototype.hasOwnProperty.call(nameStats, kk)){
+        ntot += nameStats[kk].s; ncor += nameStats[kk].c;
+      }
+    }
+    var nq = document.getElementById("mina-names");
+    if (nq){
+      nq.textContent = ntot
+        ? t("names.stat", { p:Math.round(100 * ncor / ntot), n:ntot })
+        : t("names.stat.none");
+    }
+
     renderHeatmap();
 
     var list = document.getElementById("mina-list");
@@ -3336,6 +3443,130 @@ window.RIBCLASS = {
     if (el){ el.className = ""; }
     markWelcomeSeen();
     if (map){ map.invalidateSize(); }   // it was laid out under an overlay
+  }
+
+  // ---------- name drill: flashcards, self-rated ----------
+  // Kept OUT of quizStats on purpose: the spotter measures pointing at a bone,
+  // this measures recalling its name. Averaging them would make the weakness
+  // heatmap mean nothing.
+  var NAMES_LEN = 20;
+  var nameStats = {};
+  var drill = null;
+
+  function loadNameStats(){
+    try {
+      var raw = window.localStorage.getItem("ba_namestats");
+      if (raw){ nameStats = JSON.parse(raw) || {}; }
+    } catch (e){ nameStats = {}; }
+  }
+  function saveNameStats(){
+    try { window.localStorage.setItem("ba_namestats", JSON.stringify(nameStats)); } catch (e){}
+  }
+  function recordName(id, right){
+    var r = nameStats[id] || { s:0, c:0 };
+    r.s += 1;
+    if (right){ r.c += 1; }
+    nameStats[id] = r;
+    saveNameStats();
+  }
+
+  // every entry that is a bone and carries all three names
+  function namePool(){
+    var out = [];
+    for (var i = 0; i < BONES.length; i++){
+      var b = BONES[i];
+      if (b.cls === "cartilage"){ continue; }      // shown in the atlas, not a bone
+      if (b.sv && b.la && b.en){ out.push(b); }
+    }
+    return out;
+  }
+
+  var NAME_KEYS = ["sv", "la", "en"];
+  function langLabel(k){ return t("names.lang." + k); }
+
+  var namesFrom = "page-mina";
+  function startNames(){
+    var pool = namePool();
+    if (!pool.length){ return; }
+    var cur = document.querySelector(".page.active");
+    if (cur && cur.id !== "page-names"){ namesFrom = cur.id; }
+    var order = pool.slice();
+    for (var i = order.length - 1; i > 0; i--){        // Fisher-Yates
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = order[i]; order[i] = order[j]; order[j] = tmp;
+    }
+    order = order.slice(0, Math.min(NAMES_LEN, order.length));
+    drill = { order:order, i:0, right:0, shown:false };
+    document.getElementById("names-done").setAttribute("hidden", "hidden");
+    goToPage("page-names");
+    renderCard();
+  }
+
+  function renderCard(){
+    if (!drill){ return; }
+    var b = drill.order[drill.i];
+    // the prompt language is random per card, so a round mixes all three
+    var from = NAME_KEYS[Math.floor(Math.random() * 3)];
+    drill.from = from;
+    drill.shown = false;
+    document.getElementById("names-count").textContent =
+      t("names.of", { n:drill.i + 1, m:drill.order.length });
+    document.getElementById("card-lang").textContent = langLabel(from);
+    var p = document.getElementById("card-prompt");
+    p.textContent = b[from];
+    p.style.fontStyle = (from === "la") ? "italic" : "normal";
+    var rest = [];
+    for (var k = 0; k < NAME_KEYS.length; k++){
+      if (NAME_KEYS[k] !== from){ rest.push(NAME_KEYS[k]); }
+    }
+    // ONE target language per card. Asking for both at once means a single
+    // "Kunde" has to cover two recalls, so a half-right card gets rated wrong.
+    var to = rest[Math.floor(Math.random() * rest.length)];
+    var other = (rest[0] === to) ? rest[1] : rest[0];
+    drill.to = to;
+    document.getElementById("card-ask").textContent = t("names.ask", { x:langLabel(to) });
+    var a1 = document.getElementById("ca-1"), a2 = document.getElementById("ca-2");
+    a1.textContent = b[to];                       // the answer being rated
+    a1.style.fontStyle = (to === "la") ? "italic" : "normal";
+    a2.textContent = langLabel(other) + ": " + b[other];   // context, not asked
+    a2.style.fontStyle = (other === "la") ? "italic" : "normal";
+    document.getElementById("ca-region").textContent = regionName(b.region);
+    document.getElementById("card-answer").setAttribute("hidden", "hidden");
+    document.getElementById("names-rate").setAttribute("hidden", "hidden");
+    document.getElementById("names-show").style.display = "";
+  }
+
+  function revealCard(){
+    if (!drill || drill.shown){ return; }
+    drill.shown = true;
+    document.getElementById("card-answer").removeAttribute("hidden");
+    document.getElementById("names-rate").removeAttribute("hidden");
+    document.getElementById("names-show").style.display = "none";
+  }
+
+  function rateCard(right){
+    if (!drill || !drill.shown){ return; }       // no rating before you looked
+    recordName(drill.order[drill.i].id, right);
+    if (right){ drill.right += 1; }
+    drill.i += 1;
+    if (drill.i >= drill.order.length){ finishNames(); return; }
+    renderCard();
+  }
+
+  function finishNames(){
+    var el = document.getElementById("names-done");
+    document.getElementById("names-done-t").textContent = t("names.done");
+    document.getElementById("names-done-s").textContent =
+      t("names.score", { n:drill.right, m:drill.order.length });
+    el.removeAttribute("hidden");
+    document.getElementById("names-show").style.display = "none";
+    document.getElementById("names-rate").setAttribute("hidden", "hidden");
+    drill = null;
+  }
+
+  function quitNames(){
+    drill = null;
+    goToPage(namesFrom);
   }
 
   function renderAbout(){
@@ -3759,6 +3990,7 @@ window.RIBCLASS = {
     loadStudied();
     loadSettings();
     loadQuizStats();
+    loadNameStats();
     initMap();
     applyTheme();
     applyI18n();
@@ -3772,6 +4004,10 @@ window.RIBCLASS = {
         if (action === "quiz"){
           goToPage("page-atlas");   // quiz overlay lives on the atlas
           startQuiz();
+          return;
+        }
+        if (action === "names"){
+          startNames();
           return;
         }
         if (action === "search"){
@@ -3863,6 +4099,19 @@ window.RIBCLASS = {
     var wg = document.getElementById("wel-go");
     if (wg){ wg.addEventListener("click", hideWelcome); }
     if (!seenWelcome()){ showWelcome(); }
+
+    var ns = document.getElementById("names-start");
+    if (ns){ ns.addEventListener("click", startNames); }
+    var nx = document.getElementById("names-x");
+    if (nx){ nx.addEventListener("click", quitNames); }
+    var nsh = document.getElementById("names-show");
+    if (nsh){ nsh.addEventListener("click", revealCard); }
+    var ry = document.getElementById("rate-yes");
+    if (ry){ ry.addEventListener("click", function(){ rateCard(true); }); }
+    var rn = document.getElementById("rate-no");
+    if (rn){ rn.addEventListener("click", function(){ rateCard(false); }); }
+    var na = document.getElementById("names-again");
+    if (na){ na.addEventListener("click", startNames); }
 
     var cs = document.getElementById("cram-start");
     if (cs){ cs.addEventListener("click", startCram); }
@@ -4006,7 +4255,7 @@ window.RIBCLASS = {
 <div id="upd"><span id="upd-txt"></span><button id="upd-x" type="button">Dölj</button></div>
 <script>
 (function(){
-  var HERE = "5.5.1";
+  var HERE = "5.7.1";
   if (location.protocol !== "http:" && location.protocol !== "https:"){ return; }
   if (!window.fetch){ return; }
   var host = location.hostname || "", seg = (location.pathname||"").split("/").filter(Boolean);
